@@ -19,6 +19,8 @@
     copy: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>`,
     send: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`,
     toggle: `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="5" rx="1.5"/><rect x="3" y="10" width="18" height="5" rx="1.5"/><rect x="3" y="17" width="18" height="5" rx="1.5"/></svg>`,
+    reset: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 1 3 7"/><polyline points="3 22 3 16 9 16"/></svg>`,
+    newDoc: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>`,
   };
 
   // ─── Shadow DOM Host ───────────────────────────────────────────────
@@ -110,8 +112,8 @@
     }
     .pd-tab.active { color: #fff; border-bottom-color: #3b82f6; }
     .pd-tab:hover:not(.active) { color: rgba(255,255,255,.7); }
-    .pd-close-btn {
-      margin-left: auto;
+    .pd-tabs-right { margin-left: auto; display: flex; align-items: center; gap: 2px; }
+    .pd-header-icon-btn {
       background: transparent;
       border: none;
       color: rgba(255,255,255,.4);
@@ -121,8 +123,58 @@
       align-items: center;
       border-radius: 6px;
       transition: background .15s, color .15s;
+      position: relative;
     }
-    .pd-close-btn:hover { background: rgba(255,255,255,.08); color: #fff; }
+    .pd-header-icon-btn:hover { background: rgba(255,255,255,.08); color: #fff; }
+    .pd-header-icon-btn .pd-tooltip {
+      display: none;
+      position: absolute;
+      bottom: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #111;
+      color: #ccc;
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .pd-header-icon-btn:hover .pd-tooltip { display: block; }
+
+    /* ── Reset menu ── */
+    .pd-reset-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 4px;
+      background: #2a2a36;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.5);
+      overflow: hidden;
+      z-index: 10;
+      min-width: 170px;
+    }
+    .pd-reset-menu.open { display: block; }
+    .pd-reset-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 9px 14px;
+      background: transparent;
+      border: none;
+      color: #ccc;
+      font-size: 12px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background .1s;
+      text-align: left;
+    }
+    .pd-reset-menu-item:hover { background: rgba(255,255,255,.08); color: #fff; }
+    .pd-reset-menu-item svg { flex-shrink: 0; }
 
     /* ── Body scroll area ── */
     .pd-body {
@@ -310,7 +362,22 @@
         <button class="pd-tab active" data-tab="structure">Structure Builder</button>
         <button class="pd-tab" data-tab="library">Prompt Library</button>
         <button class="pd-tab" data-tab="history">History</button>
-        <button class="pd-close-btn" id="pd-close" title="Close">${ICONS.chevronDown}</button>
+        <div class="pd-tabs-right">
+          <div style="position:relative">
+            <button class="pd-header-icon-btn" id="pd-reset-toggle" title="Reset">
+              ${ICONS.reset}
+              <span class="pd-tooltip">Reset</span>
+            </button>
+            <div class="pd-reset-menu" id="pd-reset-menu">
+              <button class="pd-reset-menu-item" id="pd-clear-values">${ICONS.reset} Clear All Values</button>
+              <button class="pd-reset-menu-item" id="pd-new-structure">${ICONS.newDoc} New Structure</button>
+            </div>
+          </div>
+          <button class="pd-header-icon-btn" id="pd-close" title="Close">
+            ${ICONS.chevronDown}
+            <span class="pd-tooltip">Close</span>
+          </button>
+        </div>
       </div>
 
       <div class="pd-body" id="pd-tab-structure"></div>
@@ -500,6 +567,30 @@
   // ─── Bind Overlay Events ───────────────────────────────────────────
   shadow.querySelectorAll('.pd-tab').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
   shadow.getElementById('pd-close')?.addEventListener('click', hideOverlay);
+
+  // Reset menu toggle
+  const resetToggle = shadow.getElementById('pd-reset-toggle');
+  const resetMenu = shadow.getElementById('pd-reset-menu');
+  resetToggle?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    resetMenu.classList.toggle('open');
+  });
+  // Close menu when clicking elsewhere
+  shadow.addEventListener('click', () => resetMenu?.classList.remove('open'));
+
+  // Clear all values (keep labels and sections)
+  shadow.getElementById('pd-clear-values')?.addEventListener('click', () => {
+    sections.forEach(s => { s.value = ''; });
+    renderSections();
+    resetMenu?.classList.remove('open');
+  });
+
+  // New structure (reset to defaults)
+  shadow.getElementById('pd-new-structure')?.addEventListener('click', () => {
+    sections = [];
+    renderSections();
+    resetMenu?.classList.remove('open');
+  });
   shadow.getElementById('pd-merge')?.addEventListener('click', () => {
     const text = assembleMergedPrompt();
     if (!text) return;
