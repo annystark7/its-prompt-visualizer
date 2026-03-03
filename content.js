@@ -10,6 +10,15 @@
   ];
   let dragSrcIndex = null;
 
+  // ─── Preset Labels ─────────────────────────────────────────────────
+  const PRESET_LABELS = [
+    'ROLE', 'CONTEXT', 'TASK', 'GOAL', 'TONE', 'FORMAT',
+    'LENGTH', 'AUDIENCE', 'STYLE', 'CONSTRAINTS', 'EXAMPLES',
+    'INPUT', 'OUTPUT', 'INSTRUCTIONS', 'PERSONA', 'SCENARIO',
+    'TOPIC', 'KEYWORDS', 'LANGUAGE', 'PERSPECTIVE', 'RULES',
+    'BACKGROUND', 'REQUIREMENTS', 'STEPS', 'CRITERIA', 'AVOID', 'INCLUDE', 'EXCLUDE', 'LIMIT'
+  ];
+
   // ─── SVG Icons ─────────────────────────────────────────────────────
   const ICONS = {
     grip: `<svg width="10" height="14" viewBox="0 0 10 14" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="1.5" r="1.5"/><circle cx="8" cy="1.5" r="1.5"/><circle cx="2" cy="7" r="1.5"/><circle cx="8" cy="7" r="1.5"/><circle cx="2" cy="12.5" r="1.5"/><circle cx="8" cy="12.5" r="1.5"/></svg>`,
@@ -258,6 +267,53 @@
       height: 1px;
       background: rgba(255,255,255,.1);
     }
+
+    /* ── Autocomplete dropdown ── */
+    .pd-label-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+    .pd-autocomplete {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      margin-top: 4px;
+      min-width: 180px;
+      max-height: 180px;
+      overflow-y: auto;
+      background: #262630;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.5);
+      z-index: 20;
+      padding: 4px;
+    }
+    .pd-autocomplete.open { display: block; }
+    .pd-autocomplete-item {
+      display: block;
+      width: 100%;
+      padding: 7px 10px;
+      background: transparent;
+      border: none;
+      color: #bbb;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: inherit;
+      letter-spacing: 0.06em;
+      text-align: left;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background .1s, color .1s;
+    }
+    .pd-autocomplete-item:hover, .pd-autocomplete-item.active { background: rgba(59,130,246,.15); color: #fff; }
+    .pd-autocomplete-item .pd-match { color: #3b82f6; }
+
+    .pd-autocomplete::-webkit-scrollbar { width: 4px; }
+    .pd-autocomplete::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 2px; }
     .pd-textarea {
       width: 100%;
       min-height: 80px;
@@ -415,7 +471,10 @@
           </div>
           <div class="pd-section-content">
             <div class="pd-section-title-row">
-              <input class="pd-label" type="text" value="${sec.label}" placeholder="SECTION NAME" data-idx="${i}" spellcheck="false" />
+              <div class="pd-label-wrapper">
+                <input class="pd-label" type="text" value="${sec.label}" placeholder="SECTION NAME" data-idx="${i}" spellcheck="false" autocomplete="off" />
+                <div class="pd-autocomplete" data-for="${i}"></div>
+              </div>
               <div class="pd-title-divider"></div>
             </div>
             <textarea class="pd-textarea"
@@ -467,18 +526,58 @@
       });
     });
 
-    // Label input sync
+    // Label input sync + autocomplete
     container.querySelectorAll('.pd-label').forEach(inp => {
+      const idx = parseInt(inp.dataset.idx, 10);
+      const dropdown = container.querySelector(`.pd-autocomplete[data-for="${idx}"]`);
+
+      function showSuggestions(filter) {
+        if (!dropdown) return;
+        const q = filter.toUpperCase();
+        const used = new Set(sections.map(s => s.label.toUpperCase()));
+        const matches = PRESET_LABELS.filter(l => !used.has(l) && (q === '' || l.includes(q)));
+        if (matches.length === 0) {
+          dropdown.classList.remove('open');
+          return;
+        }
+        dropdown.innerHTML = matches.map(label => {
+          // Highlight matching portion
+          const i = label.indexOf(q);
+          let html;
+          if (q && i >= 0) {
+            html = label.slice(0, i) + `<span class="pd-match">${label.slice(i, i + q.length)}</span>` + label.slice(i + q.length);
+          } else {
+            html = label;
+          }
+          return `<button class="pd-autocomplete-item" data-value="${label}">${html}</button>`;
+        }).join('');
+        dropdown.classList.add('open');
+
+        // Bind click on each item
+        dropdown.querySelectorAll('.pd-autocomplete-item').forEach(item => {
+          item.addEventListener('mousedown', e => {
+            e.preventDefault(); // prevent blur
+            inp.value = item.dataset.value;
+            if (sections[idx]) sections[idx].label = item.dataset.value;
+            dropdown.classList.remove('open');
+          });
+        });
+      }
+
+      inp.addEventListener('focus', () => showSuggestions(inp.value));
       inp.addEventListener('input', () => {
-        const idx = parseInt(inp.dataset.idx, 10);
         if (sections[idx]) sections[idx].label = inp.value.toUpperCase();
+        showSuggestions(inp.value);
       });
       inp.addEventListener('blur', () => {
-        const idx = parseInt(inp.dataset.idx, 10);
-        if (sections[idx] && !sections[idx].label.trim()) {
-          sections[idx].label = 'UNTITLED';
-          inp.value = 'UNTITLED';
-        }
+        // Small delay to allow mousedown on items to fire
+        setTimeout(() => {
+          dropdown?.classList.remove('open');
+          if (sections[idx] && !sections[idx].label.trim()) {
+            sections[idx].label = 'UNTITLED';
+            inp.value = 'UNTITLED';
+          }
+        }, 150);
       });
     });
 
