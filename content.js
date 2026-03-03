@@ -19,6 +19,199 @@
     'BACKGROUND', 'REQUIREMENTS', 'STEPS', 'CRITERIA', 'AVOID', 'INCLUDE', 'EXCLUDE', 'LIMIT'
   ];
 
+  // ─── Label Descriptions (for info tooltip) ───────────────────────────
+  const LABEL_DESCRIPTIONS = {
+    ROLE: 'Define who the AI should act as (e.g. expert, teacher, developer)',
+    CONTEXT: 'Provide background information or situation details',
+    TASK: 'Describe the specific task or action to perform',
+    GOAL: 'State the desired outcome or objective',
+    TONE: 'Set the communication style (e.g. formal, casual, witty)',
+    FORMAT: 'Specify the output format (e.g. list, table, essay)',
+    LENGTH: 'Define the expected length or word count',
+    AUDIENCE: 'Describe who will read or use the output',
+    STYLE: 'Set the writing or response style',
+    CONSTRAINTS: 'List any limitations or restrictions to follow',
+    EXAMPLES: 'Provide sample inputs/outputs for reference',
+    INPUT: 'Paste or describe the data/content to process',
+    OUTPUT: 'Describe the expected result or deliverable',
+    INSTRUCTIONS: 'Step-by-step directions for the AI to follow',
+    PERSONA: 'Define a specific character or personality to adopt',
+    SCENARIO: 'Describe a hypothetical situation or use case',
+    TOPIC: 'Specify the main subject or theme',
+    KEYWORDS: 'List important words or phrases to include',
+    LANGUAGE: 'Specify the programming or natural language',
+    PERSPECTIVE: 'Define the viewpoint or angle to approach from',
+    RULES: 'Set hard rules the AI must not break',
+    BACKGROUND: 'Provide relevant history or prerequisite knowledge',
+    REQUIREMENTS: 'List must-have features or conditions',
+    STEPS: 'Break down the task into ordered steps',
+    CRITERIA: 'Define success metrics or evaluation standards',
+    AVOID: 'List things to exclude or stay away from',
+    INCLUDE: 'List things that must be present in the output',
+    EXCLUDE: 'Specify content or patterns to omit',
+    LIMIT: 'Set boundaries on scope, length, or complexity',
+  };
+
+  // ─── Prompt Templates ──────────────────────────────────────────────
+  const PROMPT_TEMPLATES = [
+    {
+      name: 'Code Generation',
+      icon: '💻',
+      desc: 'Generate code with clear specs',
+      sections: [
+        { label: 'ROLE', placeholder: 'e.g. Senior Python Developer' },
+        { label: 'TASK', placeholder: 'What code to write...' },
+        { label: 'LANGUAGE', placeholder: 'e.g. Python, JavaScript, TypeScript...' },
+        { label: 'REQUIREMENTS', placeholder: 'Functional requirements...' },
+        { label: 'CONSTRAINTS', placeholder: 'e.g. No external libraries, must be async...' },
+        { label: 'OUTPUT', placeholder: 'e.g. Clean, commented code with examples' },
+      ],
+    },
+    {
+      name: 'Debugging',
+      icon: '🔧',
+      desc: 'Diagnose and fix code issues',
+      sections: [
+        { label: 'ROLE', placeholder: 'e.g. Debugging Expert' },
+        { label: 'CONTEXT', placeholder: 'What the code is supposed to do...' },
+        { label: 'INPUT', placeholder: 'Paste the buggy code...' },
+        { label: 'STEPS', placeholder: 'Steps to reproduce the issue...' },
+        { label: 'CONSTRAINTS', placeholder: 'e.g. Don\'t change the API signature...' },
+        { label: 'OUTPUT', placeholder: 'e.g. Fixed code + explanation of the bug' },
+      ],
+    },
+    {
+      name: 'Learning & Explanation',
+      icon: '📚',
+      desc: 'Understand concepts deeply',
+      sections: [
+        { label: 'ROLE', placeholder: 'e.g. Expert Teacher, Tutor' },
+        { label: 'TOPIC', placeholder: 'What to learn or explain...' },
+        { label: 'AUDIENCE', placeholder: 'e.g. Beginner, Intermediate, Expert' },
+        { label: 'STYLE', placeholder: 'e.g. Step-by-step, Analogy-based, Visual...' },
+        { label: 'INCLUDE', placeholder: 'e.g. Examples, diagrams, quizzes...' },
+        { label: 'LENGTH', placeholder: 'e.g. Detailed, Brief overview...' },
+      ],
+    },
+    {
+      name: 'Content Writing',
+      icon: '✍️',
+      desc: 'Blog posts, articles, essays',
+      sections: [
+        { label: 'ROLE', placeholder: 'e.g. SEO Content Writer' },
+        { label: 'TOPIC', placeholder: 'What to write about...' },
+        { label: 'AUDIENCE', placeholder: 'Who is reading this...' },
+        { label: 'TONE', placeholder: 'e.g. Professional, Casual, Persuasive...' },
+        { label: 'FORMAT', placeholder: 'e.g. Blog post with headings, listicle...' },
+        { label: 'LENGTH', placeholder: 'e.g. 800 words, 3 paragraphs...' },
+        { label: 'KEYWORDS', placeholder: 'SEO keywords to include...' },
+      ],
+    },
+    {
+      name: 'Email Drafting',
+      icon: '✉️',
+      desc: 'Professional or casual emails',
+      sections: [
+        { label: 'ROLE', placeholder: 'e.g. Business Professional' },
+        { label: 'CONTEXT', placeholder: 'What is this email about...' },
+        { label: 'AUDIENCE', placeholder: 'Who are you emailing...' },
+        { label: 'TONE', placeholder: 'e.g. Formal, Friendly, Urgent...' },
+        { label: 'INCLUDE', placeholder: 'Key points to mention...' },
+        { label: 'LENGTH', placeholder: 'e.g. Short and concise, Detailed...' },
+      ],
+    },
+    {
+      name: 'Marketing Copy',
+      icon: '📣',
+      desc: 'Ads, landing pages, social posts',
+      sections: [
+        { label: 'ROLE', placeholder: 'e.g. Marketing Copywriter' },
+        { label: 'TASK', placeholder: 'e.g. Write a landing page headline...' },
+        { label: 'AUDIENCE', placeholder: 'Target demographic...' },
+        { label: 'TONE', placeholder: 'e.g. Bold, Inspiring, Playful...' },
+        { label: 'GOAL', placeholder: 'e.g. Drive sign-ups, increase CTR...' },
+        { label: 'CONSTRAINTS', placeholder: 'e.g. Max 150 characters, include CTA...' },
+      ],
+    },
+    {
+      name: 'Data Analysis',
+      icon: '📊',
+      desc: 'Analyze and interpret data',
+      sections: [
+        { label: 'ROLE', placeholder: 'e.g. Data Analyst, Statistician' },
+        { label: 'CONTEXT', placeholder: 'Background on the dataset...' },
+        { label: 'INPUT', placeholder: 'Describe or paste the data...' },
+        { label: 'TASK', placeholder: 'What analysis to perform...' },
+        { label: 'OUTPUT', placeholder: 'e.g. Charts, summary, insights...' },
+        { label: 'FORMAT', placeholder: 'e.g. Table, bullet points, report...' },
+      ],
+    },
+    {
+      name: 'UI/UX Design',
+      icon: '🎨',
+      desc: 'Design briefs and feedback',
+      sections: [
+        { label: 'ROLE', placeholder: 'e.g. Senior UI/UX Designer' },
+        { label: 'TASK', placeholder: 'What to design or review...' },
+        { label: 'AUDIENCE', placeholder: 'End users of the product...' },
+        { label: 'STYLE', placeholder: 'e.g. Minimal, Material Design, Glassmorphism...' },
+        { label: 'CONSTRAINTS', placeholder: 'e.g. Mobile-first, WCAG accessible...' },
+        { label: 'INCLUDE', placeholder: 'e.g. Color palette, typography, layout...' },
+      ],
+    },
+    {
+      name: 'Interview Prep',
+      icon: '🎯',
+      desc: 'Practice questions and answers',
+      sections: [
+        { label: 'ROLE', placeholder: 'e.g. Tech Interview Coach' },
+        { label: 'TOPIC', placeholder: 'e.g. React, System Design, Behavioral...' },
+        { label: 'CONTEXT', placeholder: 'e.g. FAANG interview, Mid-level position...' },
+        { label: 'FORMAT', placeholder: 'e.g. Question + detailed answer' },
+        { label: 'CONSTRAINTS', placeholder: 'e.g. 5 questions, increasing difficulty...' },
+        { label: 'INCLUDE', placeholder: 'e.g. Follow-up questions, tips...' },
+      ],
+    },
+    {
+      name: 'Summarization',
+      icon: '📋',
+      desc: 'Summarize documents and text',
+      sections: [
+        { label: 'ROLE', placeholder: 'e.g. Research Assistant' },
+        { label: 'INPUT', placeholder: 'Paste text to summarize...' },
+        { label: 'FORMAT', placeholder: 'e.g. Bullet points, paragraph, TL;DR...' },
+        { label: 'LENGTH', placeholder: 'e.g. 3 sentences, 100 words...' },
+        { label: 'INCLUDE', placeholder: 'e.g. Key takeaways, action items...' },
+      ],
+    },
+    {
+      name: 'Translation',
+      icon: '🌐',
+      desc: 'Translate with context awareness',
+      sections: [
+        { label: 'ROLE', placeholder: 'e.g. Professional Translator' },
+        { label: 'INPUT', placeholder: 'Text to translate...' },
+        { label: 'LANGUAGE', placeholder: 'e.g. English to Spanish' },
+        { label: 'TONE', placeholder: 'e.g. Formal, Conversational, Literary...' },
+        { label: 'CONTEXT', placeholder: 'Who is the translation for...' },
+        { label: 'AVOID', placeholder: 'e.g. Literal translations, slang...' },
+      ],
+    },
+    {
+      name: 'Brainstorming',
+      icon: '💡',
+      desc: 'Generate ideas and solutions',
+      sections: [
+        { label: 'ROLE', placeholder: 'e.g. Creative Strategist' },
+        { label: 'TOPIC', placeholder: 'What to brainstorm about...' },
+        { label: 'GOAL', placeholder: 'What are you trying to achieve...' },
+        { label: 'CONSTRAINTS', placeholder: 'e.g. Budget, time, tech stack...' },
+        { label: 'FORMAT', placeholder: 'e.g. 10 ideas with pros/cons...' },
+        { label: 'PERSPECTIVE', placeholder: 'e.g. User-centric, business-first...' },
+      ],
+    },
+  ];
+
   // ─── SVG Icons ─────────────────────────────────────────────────────
   const ICONS = {
     grip: `<svg width="10" height="14" viewBox="0 0 10 14" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="1.5" r="1.5"/><circle cx="8" cy="1.5" r="1.5"/><circle cx="2" cy="7" r="1.5"/><circle cx="8" cy="7" r="1.5"/><circle cx="2" cy="12.5" r="1.5"/><circle cx="8" cy="12.5" r="1.5"/></svg>`,
@@ -257,9 +450,8 @@
       outline: none;
       font-family: inherit;
       padding: 0;
-      width: auto;
-      min-width: 60px;
-      max-width: 100%;
+      field-sizing: content;
+      min-width: 2ch;
     }
     .pd-label::placeholder { color: rgba(59,130,246,.4); }
     .pd-title-divider {
@@ -273,8 +465,7 @@
       position: relative;
       display: flex;
       align-items: center;
-      gap: 10px;
-      flex: 1;
+      gap: 2px;
     }
     .pd-autocomplete {
       display: none;
@@ -314,6 +505,49 @@
 
     .pd-autocomplete::-webkit-scrollbar { width: 4px; }
     .pd-autocomplete::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 2px; }
+
+    /* ── Info icon ── */
+    .pd-info-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.15);
+      background: transparent;
+      color: rgba(255,255,255,.3);
+      cursor: help;
+      padding: 0;
+      flex-shrink: 0;
+      position: relative;
+      font-size: 9px;
+      font-weight: 700;
+      font-family: inherit;
+      transition: color .15s, border-color .15s;
+    }
+    .pd-info-btn:hover { color: #3b82f6; border-color: rgba(59,130,246,.5); }
+    .pd-info-tip {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a1a24;
+      color: #ccc;
+      font-size: 11px;
+      font-weight: 400;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,.1);
+      max-width: 260px;
+      white-space: normal;
+      line-height: 1.4;
+      pointer-events: none;
+      z-index: 30;
+      box-shadow: 0 4px 16px rgba(0,0,0,.5);
+    }
+    .pd-info-btn:hover .pd-info-tip { display: block; }
     .pd-textarea {
       width: 100%;
       min-height: 80px;
@@ -349,6 +583,165 @@
     .pd-add-btn:hover { border-color: #3b82f6; color: #3b82f6; }
 
     .pd-placeholder { text-align: center; padding: 48px 0; color: rgba(255,255,255,.25); font-size: 13px; }
+
+    /* ── Library ── */
+    .pd-library-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .pd-template-card {
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 10px;
+      padding: 14px 16px;
+      cursor: default;
+      transition: border-color .15s;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .pd-template-card:hover { border-color: rgba(255,255,255,.18); }
+    .pd-template-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .pd-template-icon {
+      font-size: 20px;
+      line-height: 1;
+      width: 28px;
+      text-align: center;
+    }
+    .pd-template-info { flex: 1; min-width: 0; }
+    .pd-template-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #e8e8e8;
+    }
+    .pd-template-desc {
+      font-size: 11px;
+      color: rgba(255,255,255,.4);
+      margin-top: 1px;
+    }
+    .pd-template-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .pd-template-tag {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      color: rgba(59,130,246,.8);
+      background: rgba(59,130,246,.1);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+    .pd-template-use-btn {
+      width: 100%;
+      padding: 7px;
+      border-radius: 7px;
+      border: 1px solid rgba(59,130,246,.3);
+      background: rgba(59,130,246,.08);
+      color: #3b82f6;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+      letter-spacing: .02em;
+    }
+    .pd-template-use-btn:hover { background: rgba(59,130,246,.2); border-color: #3b82f6; }
+
+    /* ── History ── */
+    .pd-history-list { display: flex; flex-direction: column; gap: 10px; }
+    .pd-history-card {
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: border-color .15s;
+    }
+    .pd-history-card:hover { border-color: rgba(255,255,255,.18); }
+    .pd-history-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .pd-history-time {
+      font-size: 11px;
+      color: rgba(255,255,255,.35);
+    }
+    .pd-history-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .pd-history-use-btn {
+      padding: 4px 10px;
+      border-radius: 5px;
+      border: 1px solid rgba(59,130,246,.3);
+      background: rgba(59,130,246,.08);
+      color: #3b82f6;
+      font-size: 10px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .pd-history-use-btn:hover { background: rgba(59,130,246,.2); }
+    .pd-history-del-btn {
+      padding: 4px 8px;
+      border-radius: 5px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: transparent;
+      color: rgba(255,255,255,.3);
+      font-size: 10px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: color .15s, border-color .15s;
+    }
+    .pd-history-del-btn:hover { color: #f87171; border-color: rgba(248,113,113,.3); }
+    .pd-history-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+    .pd-history-tag {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      color: rgba(255,255,255,.5);
+      background: rgba(255,255,255,.06);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+    .pd-history-preview {
+      font-size: 11px;
+      color: rgba(255,255,255,.3);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .pd-history-empty { text-align: center; padding: 48px 0; color: rgba(255,255,255,.25); font-size: 13px; }
+
+    /* ── Search bar ── */
+    .pd-search-bar {
+      width: 100%;
+      padding: 9px 12px;
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 8px;
+      color: #ddd;
+      font-size: 12px;
+      font-family: inherit;
+      outline: none;
+      margin-bottom: 12px;
+      transition: border-color .15s;
+      box-sizing: border-box;
+    }
+    .pd-search-bar:focus { border-color: rgba(59,130,246,.5); }
+    .pd-search-bar::placeholder { color: rgba(255,255,255,.25); }
 
     /* ── Footer ── */
     .pd-footer {
@@ -437,12 +830,8 @@
       </div>
 
       <div class="pd-body" id="pd-tab-structure"></div>
-      <div class="pd-body hidden" id="pd-tab-library">
-        <p class="pd-placeholder">Prompt Library — coming soon.</p>
-      </div>
-      <div class="pd-body hidden" id="pd-tab-history">
-        <p class="pd-placeholder">Merge history — coming soon.</p>
-      </div>
+      <div class="pd-body hidden" id="pd-tab-library"></div>
+      <div class="pd-body hidden" id="pd-tab-history"></div>
 
       <div class="pd-footer">
         <button class="pd-merge-btn" id="pd-merge">
@@ -455,6 +844,192 @@
     </div>
   `;
   shadow.appendChild(overlay);
+
+  // ─── Render Library ──────────────────────────────────────────────────
+  let librarySearchQuery = '';
+
+  function renderLibrary() {
+    const container = shadow.getElementById('pd-tab-library');
+    if (!container) return;
+
+    const q = librarySearchQuery.toLowerCase();
+    const filtered = PROMPT_TEMPLATES.map((tmpl, i) => ({ tmpl, i })).filter(({ tmpl }) => {
+      if (!q) return true;
+      return tmpl.name.toLowerCase().includes(q)
+        || tmpl.desc.toLowerCase().includes(q)
+        || tmpl.sections.some(s => s.label.toLowerCase().includes(q));
+    });
+
+    let html = `<input class="pd-search-bar" id="pd-library-search" type="text" placeholder="Search templates..." value="${librarySearchQuery}" />`;
+
+    if (filtered.length === 0) {
+      html += '<p class="pd-placeholder">No templates match your search.</p>';
+    } else {
+      html += '<div class="pd-library-grid">';
+      filtered.forEach(({ tmpl, i }) => {
+        const tags = tmpl.sections.map(s => `<span class="pd-template-tag">${s.label}</span>`).join('');
+        html += `
+          <div class="pd-template-card">
+            <div class="pd-template-header">
+              <span class="pd-template-icon">${tmpl.icon}</span>
+              <div class="pd-template-info">
+                <div class="pd-template-name">${tmpl.name}</div>
+                <div class="pd-template-desc">${tmpl.desc}</div>
+              </div>
+            </div>
+            <div class="pd-template-tags">${tags}</div>
+            <button class="pd-template-use-btn" data-tmpl-idx="${i}">Use Template</button>
+          </div>`;
+      });
+      html += '</div>';
+    }
+    container.innerHTML = html;
+
+    // Bind search
+    const searchInput = container.querySelector('#pd-library-search');
+    searchInput?.addEventListener('input', () => {
+      librarySearchQuery = searchInput.value;
+      renderLibrary();
+      // Refocus and restore cursor
+      const newInput = container.querySelector('#pd-library-search');
+      if (newInput) {
+        newInput.focus();
+        newInput.selectionStart = newInput.selectionEnd = newInput.value.length;
+      }
+    });
+
+    // Bind use buttons
+    container.querySelectorAll('.pd-template-use-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.tmplIdx, 10);
+        const tmpl = PROMPT_TEMPLATES[idx];
+        if (!tmpl) return;
+        sections = tmpl.sections.map(s => ({
+          id: crypto.randomUUID(),
+          label: s.label,
+          value: '',
+          placeholder: s.placeholder,
+        }));
+        switchTab('structure');
+        renderSections();
+      });
+    });
+  }
+  renderLibrary();
+
+  // ─── History (localStorage) ────────────────────────────────────────
+  const HISTORY_KEY = 'promptdeck_history';
+
+  function getHistory() {
+    try {
+      return JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+    } catch { return []; }
+  }
+
+  function saveToHistory() {
+    const filled = sections.filter(s => s.value.trim());
+    if (filled.length === 0) return;
+    const entry = {
+      id: crypto.randomUUID(),
+      timestamp: Date.now(),
+      sections: sections.map(s => ({ label: s.label, value: s.value, placeholder: s.placeholder || '' })),
+    };
+    const history = getHistory();
+    history.unshift(entry);
+    // Keep max 50 entries
+    if (history.length > 50) history.length = 50;
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  }
+
+  let historySearchQuery = '';
+
+  function renderHistory() {
+    const container = shadow.getElementById('pd-tab-history');
+    if (!container) return;
+    const history = getHistory();
+
+    if (history.length === 0) {
+      container.innerHTML = '<p class="pd-history-empty">No history yet. Merge or send a prompt to save it here.</p>';
+      return;
+    }
+
+    const q = historySearchQuery.toLowerCase();
+    const filtered = history.map((entry, i) => ({ entry, i })).filter(({ entry }) => {
+      if (!q) return true;
+      return entry.sections.some(s =>
+        s.label.toLowerCase().includes(q) || s.value.toLowerCase().includes(q)
+      );
+    });
+
+    let html = `<input class="pd-search-bar" id="pd-history-search" type="text" placeholder="Search history..." value="${historySearchQuery}" />`;
+
+    if (filtered.length === 0) {
+      html += '<p class="pd-placeholder">No history entries match your search.</p>';
+    } else {
+      html += '<div class="pd-history-list">';
+      filtered.forEach(({ entry, i }) => {
+        const date = new Date(entry.timestamp);
+        const timeStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' ' + date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        const tags = entry.sections.map(s => `<span class="pd-history-tag">${s.label}</span>`).join('');
+        const preview = entry.sections.filter(s => s.value.trim()).map(s => s.value.trim()).join(' • ').slice(0, 120);
+        html += `
+          <div class="pd-history-card">
+            <div class="pd-history-top">
+              <span class="pd-history-time">${timeStr}</span>
+              <div class="pd-history-actions">
+                <button class="pd-history-use-btn" data-hist-idx="${i}">Use in Builder</button>
+                <button class="pd-history-del-btn" data-hist-idx="${i}">✕</button>
+              </div>
+            </div>
+            <div class="pd-history-tags">${tags}</div>
+            ${preview ? `<div class="pd-history-preview">${preview}…</div>` : ''}
+          </div>`;
+      });
+      html += '</div>';
+    }
+    container.innerHTML = html;
+
+    // Bind search
+    const searchInput = container.querySelector('#pd-history-search');
+    searchInput?.addEventListener('input', () => {
+      historySearchQuery = searchInput.value;
+      renderHistory();
+      const newInput = container.querySelector('#pd-history-search');
+      if (newInput) {
+        newInput.focus();
+        newInput.selectionStart = newInput.selectionEnd = newInput.value.length;
+      }
+    });
+
+    // Bind use buttons
+    container.querySelectorAll('.pd-history-use-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.histIdx, 10);
+        const entry = getHistory()[idx];
+        if (!entry) return;
+        sections = entry.sections.map(s => ({
+          id: crypto.randomUUID(),
+          label: s.label,
+          value: s.value,
+          placeholder: s.placeholder || 'Enter details...',
+        }));
+        switchTab('structure');
+        renderSections();
+      });
+    });
+
+    // Bind delete buttons
+    container.querySelectorAll('.pd-history-del-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.histIdx, 10);
+        const history = getHistory();
+        history.splice(idx, 1);
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+        renderHistory();
+      });
+    });
+  }
+  renderHistory();
 
   // ─── Render Sections ───────────────────────────────────────────────
   function renderSections() {
@@ -473,6 +1048,7 @@
             <div class="pd-section-title-row">
               <div class="pd-label-wrapper">
                 <input class="pd-label" type="text" value="${sec.label}" placeholder="SECTION NAME" data-idx="${i}" spellcheck="false" autocomplete="off" />
+                ${LABEL_DESCRIPTIONS[sec.label.toUpperCase()] ? `<button class="pd-info-btn" type="button">i<span class="pd-info-tip">${LABEL_DESCRIPTIONS[sec.label.toUpperCase()]}</span></button>` : ''}
                 <div class="pd-autocomplete" data-for="${i}"></div>
               </div>
               <div class="pd-title-divider"></div>
@@ -530,6 +1106,22 @@
     container.querySelectorAll('.pd-label').forEach(inp => {
       const idx = parseInt(inp.dataset.idx, 10);
       const dropdown = container.querySelector(`.pd-autocomplete[data-for="${idx}"]`);
+      const wrapper = inp.closest('.pd-label-wrapper');
+
+      // Dynamically update the info button based on current label
+      function updateInfoButton() {
+        const existing = wrapper.querySelector('.pd-info-btn');
+        if (existing) existing.remove();
+        const label = (inp.value || '').toUpperCase();
+        const desc = LABEL_DESCRIPTIONS[label];
+        if (desc) {
+          const btn = document.createElement('button');
+          btn.className = 'pd-info-btn';
+          btn.type = 'button';
+          btn.innerHTML = `i<span class="pd-info-tip">${desc}</span>`;
+          wrapper.insertBefore(btn, dropdown);
+        }
+      }
 
       function showSuggestions(filter) {
         if (!dropdown) return;
@@ -560,6 +1152,7 @@
             inp.value = item.dataset.value;
             if (sections[idx]) sections[idx].label = item.dataset.value;
             dropdown.classList.remove('open');
+            updateInfoButton();
           });
         });
       }
@@ -568,6 +1161,7 @@
       inp.addEventListener('input', () => {
         if (sections[idx]) sections[idx].label = inp.value.toUpperCase();
         showSuggestions(inp.value);
+        updateInfoButton();
       });
       inp.addEventListener('blur', () => {
         // Small delay to allow mousedown on items to fire
@@ -577,6 +1171,7 @@
             sections[idx].label = 'UNTITLED';
             inp.value = 'UNTITLED';
           }
+          updateInfoButton();
         }, 150);
       });
     });
@@ -661,6 +1256,7 @@
       const p = shadow.getElementById(`pd-tab-${t}`);
       if (p) { if (t === tab) p.classList.remove('hidden'); else p.classList.add('hidden'); }
     });
+    if (tab === 'history') renderHistory();
   }
 
   // ─── Bind Overlay Events ───────────────────────────────────────────
@@ -693,6 +1289,7 @@
   shadow.getElementById('pd-merge')?.addEventListener('click', () => {
     const text = assembleMergedPrompt();
     if (!text) return;
+    saveToHistory();
     injectIntoChatGPT(text);
     hideOverlay();
   });
@@ -703,6 +1300,7 @@
   shadow.getElementById('pd-send')?.addEventListener('click', () => {
     const text = assembleMergedPrompt();
     if (!text) return;
+    saveToHistory();
     injectIntoChatGPT(text);
     hideOverlay();
     // Click ChatGPT's send button after a short delay so React processes the input
