@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>PromptDeck Settings</title>
+  <style>
+    :root {
+      --bg: #1e1e24;
+      --surface: #262630;
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      width: 320px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pd-header {
+      padding: 20px 24px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .pd-logo {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #60a5fa, #a78bfa);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    }
+
+    .pd-title-area {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    h1 {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: #fff;
+    }
+
+    .pd-version {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.04em;
+    }
+
+    .pd-content {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .pd-status-card {
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .pd-status-icon {
+      width: 12px;
+      height: 12px;
+      background: #22c55e;
+      border-radius: 50%;
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.6);
+      flex-shrink: 0;
+    }
+
+    .pd-status-text {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .pd-status-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .pd-status-desc {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.6);
+      line-height: 1.4;
+    }
+
+    .pd-action-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 12px 0;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .pd-action-btn:hover {
+      background: var(--accent-hover);
+    }
+
+    .pd-action-btn:active {
+      transform: scale(0.98);
+    }
+
+    .pd-action-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .pd-footer {
+      padding: 16px 24px;
+      text-align: center;
+      border-top: 1px solid var(--border);
+    }
+
+    .pd-footer a {
+      color: var(--text-muted);
+      font-size: 11px;
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .pd-footer a:hover {
+      color: #fff;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="pd-header">
+    <div class="pd-logo">✨</div>
+    <div class="pd-title-area">
+      <h1>PromptDeck</h1>
+      <span class="pd-version">v1.0.0</span>
+    </div>
+  </div>
+
+  <div class="pd-content">
+    <div class="pd-status-card">
+      <div class="pd-status-icon"></div>
+      <div class="pd-status-text">
+        <div class="pd-status-title">Ready to use</div>
+        <div class="pd-status-desc">PromptDeck turns your ideas into perfect prompts.</div>
+      </div>
+    </div>
+
+    <button class="pd-action-btn" id="open-chatgpt">
+      Open ChatGPT
+      <svg viewBox="0 0 24 24">
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+        <polyline points="15 3 21 3 21 9"></polyline>
+        <line x1="10" y1="14" x2="21" y2="3"></line>
+      </svg>
+    </button>
+  </div>
+
+  <div class="pd-footer">
+    <a href="https://chatgpt.com" target="_blank">Need help?</a>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>
